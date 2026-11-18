@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#eaf8ff">
+  <title>Johannas Kite-Abenteuer</title>
+  <style>
+    :root {
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: #17364b;
+      background: #eaf8ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      padding: 18px;
+      background: radial-gradient(ellipse at 12% 9%, #fff8df 0, transparent 27rem), linear-gradient(160deg, #effaff, #d9f3ff 70%, #e8fbf2);
+    }
+    button { font: inherit; }
+    .page { width: min(1120px, 100%); margin: 0 auto; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 2px 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand-mark {
+      display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center;
+      border-radius: 15px; background: #fff; box-shadow: 0 5px 16px #2b739022; font-size: 24px;
+    }
+    h1 { overflow: hidden; margin: 0; color: #164a68; font-size: clamp(17px, 4vw, 23px); letter-spacing: -.5px; text-overflow: ellipsis; white-space: nowrap; }
+    .gift-tag { flex: 0 0 auto; padding: 8px 12px; border: 1px solid #f3d880; border-radius: 999px; background: #fff7d9; color: #765d1e; font-size: 13px; font-weight: 700; }
+    .game-shell { overflow: hidden; border: 5px solid #fff; border-radius: 24px; background: #8ed8eb; box-shadow: 0 16px 42px #17628726, 0 2px 5px #17628712; }
+    .game-frame { position: relative; aspect-ratio: 16 / 9; min-height: 280px; max-height: min(68vh, 650px); background: #9ce0ee; }
+    canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+    .hud { position: absolute; z-index: 1; top: 14px; right: 16px; left: 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; pointer-events: none; }
+    .lesson-card, .progress-card { border: 1px solid #ffffffb8; border-radius: 15px; background: #ffffffdf; box-shadow: 0 4px 14px #23556c18; backdrop-filter: blur(7px); }
+    .lesson-card { width: min(440px, 62%); padding: 10px 13px; }
+    .lesson-kicker { display: block; margin-bottom: 3px; color: #3282a1; font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    .lesson-title { display: block; color: #17455e; font-size: clamp(12px, 2.2vw, 16px); font-weight: 800; }
+    .lesson-hint { display: block; margin-top: 3px; color: #456b7d; font-size: clamp(10px, 1.8vw, 12px); line-height: 1.25; }
+    .progress-card { min-width: 105px; padding: 9px 12px; color: #285d72; font-size: 12px; font-weight: 800; text-align: center; }
+    .progress-card strong { display: block; margin-bottom: 3px; color: #e09a25; font-size: 17px; }
+    .overlay { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; padding: 18px; background: #123f5580; backdrop-filter: blur(4px); }
+    .overlay[hidden] { display: none; }
+    .dialog { width: min(470px, 100%); max-height: 100%; overflow: auto; padding: clamp(18px, 4vw, 30px); border: 3px solid #fff; border-radius: 23px; background: linear-gradient(145deg, #fffef9, #f1fbff); box-shadow: 0 15px 48px #09384c55; text-align: center; }
+    .dialog-emoji { font-size: 38px; line-height: 1; }
+    .dialog h2 { margin: 11px 0 7px; color: #16506e; font-size: clamp(21px, 5vw, 28px); }
+    .dialog p { margin: 8px 0; color: #476979; font-size: 14px; line-height: 1.5; }
+    .gift-note { margin: 15px 0; padding: 11px 13px; border-radius: 13px; background: #fff4d1; color: #725d2c; font-size: 13px; line-height: 1.45; text-align: left; }
+    .primary { min-height: 48px; padding: 11px 22px; border: 0; border-radius: 999px; background: #ef9e3b; box-shadow: 0 4px 0 #d58026; color: #fff; cursor: pointer; font-size: 16px; font-weight: 800; }
+    .primary:active { transform: translateY(2px); box-shadow: 0 2px 0 #d58026; }
+    .primary:focus-visible, .touch-button:focus-visible { outline: 3px solid #144d6a; outline-offset: 3px; }
+    .touch-controls { position: absolute; z-index: 2; right: 14px; bottom: 12px; left: 14px; display: none; align-items: end; justify-content: space-between; pointer-events: none; }
+    .direction-pad, .action-pad { display: flex; gap: 9px; pointer-events: auto; }
+    .touch-button {
+      display: grid; width: 62px; height: 62px; place-items: center; border: 2px solid #ffffffcf; border-radius: 21px;
+      background: #ffffffbd; box-shadow: 0 4px 12px #164c6325; color: #18536d; cursor: pointer; font-size: 25px; font-weight: 900;
+      touch-action: none; user-select: none; -webkit-user-select: none;
+    }
+    .touch-button.jump { width: 74px; height: 74px; border-radius: 50%; background: #ffcf69e8; color: #694716; font-size: 13px; }
+    .touch-button:active, .touch-button.is-pressed { transform: scale(.94); background: #fff; }
+    .below { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin: 12px 4px 0; }
+    .controls-copy, .safety { margin: 0; color: #406474; font-size: 12px; line-height: 1.45; }
+    .controls-copy strong { color: #19536e; }
+    .safety { max-width: 570px; text-align: right; }
+    .mobile-hint { display: none; }
+    @media (pointer: coarse), (max-width: 760px) {
+      body { padding: max(8px, env(safe-area-inset-top)) 8px max(10px, env(safe-area-inset-bottom)); }
+      .topbar { margin: 0 2px 8px; }
+      .brand-mark { width: 36px; height: 36px; border-radius: 12px; font-size: 21px; }
+      .gift-tag { padding: 7px 9px; font-size: 11px; }
+      .game-shell { border-width: 3px; border-radius: 17px; }
+      .game-frame { min-height: 0; max-height: none; }
+      .hud { top: 8px; right: 8px; left: 8px; }
+      .lesson-card { width: min(65%, 390px); padding: 7px 9px; border-radius: 11px; }
+      .lesson-kicker { font-size: 8px; }
+      .lesson-hint { max-width: 38ch; }
+      .progress-card { min-width: 78px; padding: 7px 8px; border-radius: 11px; font-size: 10px; }
+      .progress-card strong { font-size: 14px; }
+      .touch-controls { display: flex; right: 9px; bottom: 8px; left: 9px; }
+      .touch-button { width: 54px; height: 54px; border-radius: 18px; font-size: 21px; }
+      .touch-button.jump { width: 64px; height: 64px; font-size: 12px; }
+      .below { display: block; margin: 8px 3px 0; }
+      .controls-copy { display: none; }
+      .safety { text-align: left; font-size: 11px; }
+      .mobile-hint { display: inline; }
+    }
+    @media (max-height: 520px) and (orientation: landscape) {
+      body { padding-top: 4px; padding-bottom: 4px; }
+      .topbar { margin-bottom: 4px; }
+      .brand-mark { display: none; }
+      .game-frame { max-height: 76vh; }
+      .below { display: none; }
+      .touch-button { width: 47px; height: 47px; }
+      .touch-button.jump { width: 55px; height: 55px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">🪁</span><h1>Johannas Kite-Abenteuer</h1></div>
+      <span class="gift-tag">☀️ Ein Geburtstagsgeschenk für Johanna</span>
+    </header>
+    <section class="game-shell" aria-label="Kite-Abenteuer-Spiel">
+      <div class="game-frame">
+        <canvas id="game" width="960" height="540" aria-label="Jump-and-Run: Laufe, springe und sammle Windsterne auf Sizilien."></canvas>
+        <div class="hud" aria-live="polite">
+          <div class="lesson-card">
+            <span class="lesson-kicker" id="lesson-kicker">Dein Kitekurs · Etappe 1 von 5</span>
+            <span class="lesson-title" id="lesson-title">Wind entdecken</span>
+            <span class="lesson-hint" id="lesson-hint">Spüre die Böen und sammle drei Windsterne.</span>
+          </div>
+          <div class="progress-card"><strong id="star-count">✦ 0 / 3</strong><span>Windsterne</span></div>
+        </div>
+        <div class="touch-controls" aria-label="Touch-Steuerung">
+          <div class="direction-pad">
+            <button class="touch-button" type="button" data-control="left" aria-label="Nach links laufen">‹</button>
+            <button class="touch-button" type="button" data-control="right" aria-label="Nach rechts laufen">›</button>
+          </div>
+          <div class="action-pad"><button class="touch-button jump" type="button" data-control="jump" aria-label="Springen">SPRING</button></div>
+        </div>
+        <div class="overlay" id="overlay">
+          <div class="dialog">
+            <div class="dialog-emoji" id="dialog-emoji">🌊 🪁</div>
+            <h2 id="dialog-title">Ciao Johanna!</h2>
+            <p id="dialog-copy">Bereit für dein Kite-Abenteuer an der sonnigen Küste Siziliens? Hilf unserer kleinen Kiterin, fünf Etappen zu meistern und alle Windsterne zu finden.</p>
+            <div class="gift-note" id="dialog-note">🎂 Alles Liebe zum Geburtstag! Ein kleiner Vorgeschmack auf deinen Kitekurs – das echte Abenteuer wartet auf Sizilien.</div>
+            <button class="primary" id="dialog-button" type="button">Abenteuer starten</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer class="below">
+      <p class="controls-copy"><strong>Steuerung:</strong> ← → oder A / D laufen · ↑, W oder Leertaste springen · R Etappe neu starten</p>
+      <p class="safety">Spielerische Kurs-Inspiration, keine offizielle VDWS-Unterlage oder Praxisanleitung. Kiten und Sicherheitsregeln lernst du vor Ort immer mit deiner qualifizierten Kurslehrerin oder deinem Kurslehrer. <span class="mobile-hint">Am besten im Querformat spielen.</span></p>
+    </footer>
+  </main>
+  <script>
+    (() => {
+      "use strict";
+      const canvas = document.getElementById("game");
+      const ctx = canvas.getContext("2d");
+      const overlay = document.getElementById("overlay");
+      const dialogEmoji = document.getElementById("dialog-emoji");
+      const dialogTitle = document.getElementById("dialog-title");
+      const dialogCopy = document.getElementById("dialog-copy");
+      const dialogNote = document.getElementById("dialog-note");
+      const dialogButton = document.getElementById("dialog-button");
+      const lessonKicker = document.getElementById("lesson-kicker");
+      const lessonTitle = document.getElementById("lesson-title");
+      const lessonHint = document.getElementById("lesson-hint");
+      const starCount = document.getElementById("star-count");
+      const width = canvas.width;
+      const height = canvas.height;
+
+      const lessons = [
+        {
+          title: "Wind entdecken", hint: "Spüre die Böen und sammle drei Windsterne.", world: "Land",
+          colors: ["#83d9ec", "#c5edf0", "#4d9b8c", "#e7c77f"],
+          items: [[280, 400], [760, 347], [1335, 400]],
+          platforms: [[0, 480], [420, 480], [840, 480], [1260, 480], [1680, 480], [370, 399], [790, 367], [1120, 405], [1375, 382]],
+          note: "Der Wind verändert sich – beim Kurs lernst du, Windrichtung und Kitefenster unter Anleitung einzuschätzen."
+        },
+        {
+          title: "Sicher starten & landen", hint: "Finde die Helfer-Flaggen auf deinem Weg.", world: "Startplatz",
+          colors: ["#8bdced", "#d4f0e9", "#6db889", "#e4c47d"],
+          items: [[350, 400], [895, 360], [1450, 344]],
+          platforms: [[0, 480], [420, 480], [840, 480], [1260, 480], [1680, 480], [420, 400], [780, 386], [1160, 404], [1380, 370]],
+          note: "Start und Landung brauchen ein Team und freie Fläche. Die echten Abläufe zeigt dir deine Kurslehrkraft."
+        },
+        {
+          title: "Bodydrag entdecken", hint: "Gleite durch die blaue Lagune und sammle Muscheln.", world: "Lagune",
+          colors: ["#79d7ef", "#c4eff1", "#43b6c1", "#d9d59a"],
+          items: [[250, 414], [790, 393], [1370, 360]],
+          platforms: [[0, 480], [420, 480], [840, 480], [1260, 480], [1680, 480], [340, 418], [660, 400], [1080, 417], [1300, 386]],
+          note: "Bodydrag ist ein Lernschritt im Wasser. Übe ihn ausschließlich so, wie deine Kurslehrkraft es dir zeigt."
+        },
+        {
+          title: "Wasserstart üben", hint: "Springe über die Wellen und finde dein Board.", world: "Wellen",
+          colors: ["#76cde7", "#c7e9ef", "#369eaf", "#e7cb8d"],
+          items: [[320, 365], [900, 337], [1430, 363]],
+          platforms: [[0, 480], [420, 480], [840, 480], [1260, 480], [1680, 480], [360, 405], [730, 374], [1125, 407], [1350, 389]],
+          note: "Beim Wasserstart kommen mehrere Dinge zusammen. Das sichere Timing übst du Schritt für Schritt mit deinem Kurs."
+        },
+        {
+          title: "Die erste Fahrt!", hint: "Sammle die letzten Sterne und surfe ins Ziel.", world: "Erste Fahrt",
+          colors: ["#71cce8", "#c6ebf0", "#3babb7", "#e5c27b"],
+          items: [[300, 400], [820, 350], [1370, 379]],
+          platforms: [[0, 480], [420, 480], [840, 480], [1260, 480], [1680, 480], [390, 390], [755, 375], [1130, 405], [1400, 385]],
+          note: "Juhu, die erste Fahrt! Im echten Kurs stehen Spaß, passende Bedingungen und Sicherheit immer an erster Stelle."
+        }
+      ];
+
+      const player = { x: 65, y: 0, vx: 0, vy: 0, w: 32, h: 52, grounded: false, facing: 1 };
+      const controls = { left: false, right: false, jump: false };
+      const state = { level: 0, camera: 0, items: [], active: false, frame: 0, message: "", messageUntil: 0 };
+      const worldLength = 1900;
+      const currentLesson = () => lessons[state.level];
+
+      function loadLesson(index) {
+        state.level = index;
+        state.camera = 0;
+        state.items = currentLesson().items.map(([x, y]) => ({ x, y, found: false }));
+        player.x = 65;
+        player.y = 420;
+        player.vx = 0;
+        player.vy = 0;
+        player.grounded = false;
+        updateHud();
+      }
+
+      function updateHud() {
+        lessonKicker.textContent = `Dein Kitekurs · Etappe ${state.level + 1} von ${lessons.length}`;
+        lessonTitle.textContent = currentLesson().title;
+        lessonHint.textContent = currentLesson().hint;
+        starCount.textContent = `✦ ${state.items.filter(item => item.found).length} / ${state.items.length}`;
+      }
+
+      function showDialog({ emoji, title, copy, note, button, action }) {
+        dialogEmoji.textContent = emoji;
+        dialogTitle.textContent = title;
+        dialogCopy.textContent = copy;
+        dialogNote.textContent = note;
+        dialogButton.textContent = button;
+        dialogButton.onclick = action;
+        overlay.hidden = false;
+        state.active = false;
+      }
+
+      function beginLesson() {
+        overlay.hidden = true;
+        state.active = true;
+        canvas.focus({ preventScroll: true });
+        lastTime = performance.now();
+      }
+
+      function startGame() {
+        loadLesson(0);
+        beginLesson();
+      }
+      dialogButton.onclick = startGame;
+
+      function nextLesson() {
+        if (state.level < lessons.length - 1) {
+          loadLesson(state.level + 1);
+          const emojis = ["🍃 🪁", "🚩 🤝", "🐚 🌊", "🏄‍♀️ 💦", "🌟 🏖️"];
+          showDialog({
+            emoji: emojis[state.level], title: currentLesson().title,
+            copy: `Etappe ${state.level + 1} von ${lessons.length}: ${currentLesson().hint}`,
+            note: currentLesson().note, button: "Weiter geht's!", action: beginLesson
+          });
+        } else {
+          showDialog({
+            emoji: "🏄‍♀️ 🌟 🎂", title: "Du hast es geschafft, Johanna!",
+            copy: "Fünf Etappen, jede Menge Windsterne und deine erste spielerische Kite-Fahrt – die sonnige Küste Siziliens wartet schon auf dich!",
+            note: "Alles Liebe zum Geburtstag und ganz viel Freude bei deinem Kitekurs! 🎁☀️",
+            button: "Nochmal spielen", action: startGame
+          });
+        }
+      }
+
+      function restartLesson() {
+        loadLesson(state.level);
+        toast("Etappe neu gestartet");
+      }
+
+      function toast(text) {
+        state.message = text;
+        state.messageUntil = state.frame + 100;
+      }
+
+      function update(dt) {
+        if (!state.active) return;
+        state.frame += dt * 60;
+        const previousBottom = player.y + player.h;
+        const speed = 4.05;
+        player.vx = (controls.right ? speed : 0) - (controls.left ? speed : 0);
+        if (player.vx !== 0) player.facing = Math.sign(player.vx);
+        if (controls.jump && player.grounded) {
+          player.vy = -11.4;
+          player.grounded = false;
+        }
+        player.vy = Math.min(player.vy + .54 * dt * 60, 13);
+        player.x = Math.max(0, Math.min(worldLength - player.w, player.x + player.vx * dt * 60));
+        player.y += player.vy * dt * 60;
+        player.grounded = false;
+
+        for (const [platformX, platformY] of currentLesson().platforms) {
+          if (player.vy >= 0 && previousBottom <= platformY + 5 && player.y + player.h >= platformY &&
+              player.x + player.w > platformX && player.x < platformX + 340) {
+            player.y = platformY - player.h;
+            player.vy = 0;
+            player.grounded = true;
+          }
+        }
+
+        if (player.y > height + 80) {
+          player.x = Math.max(65, player.x - 180);
+          player.y = 300;
+          player.vy = 0;
+          toast("Hoppla! Versuch's nochmal.");
+        }
+
+        for (const item of state.items) {
+          if (!item.found && Math.hypot(player.x + player.w / 2 - item.x, player.y + player.h / 2 - item.y) < 37) {
+            item.found = true;
+            updateHud();
+            toast(["Windstern entdeckt!", "Super Teamwork!", "Muschel gefunden!", "Board gefunden!", "Stern für deine erste Fahrt!"][state.level]);
+          }
+        }
+
+        const targetCamera = Math.max(0, Math.min(worldLength - width, player.x - width * .38));
+        state.camera += (targetCamera - state.camera) * Math.min(1, dt * 8);
+
+        if (player.x > worldLength - 115) {
+          if (state.items.every(item => item.found)) nextLesson();
+          else {
+            player.x = worldLength - 135;
+            toast("Finde erst alle drei Sterne!");
+          }
+        }
+      }
+
+      function drawBackground() {
+        const [sky, haze, sea, sand] = currentLesson().colors;
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, sky);
+        gradient.addColorStop(.68, haze);
+        gradient.addColorStop(1, sea);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = "#fff4c6";
+        ctx.beginPath();
+        ctx.arc(790, 110, 39, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff75";
+        for (let i = 0; i < 4; i++) {
+          const x = ((i * 280 - state.camera * .18) % 1200 + 1200) % 1200 - 80;
+          const y = 93 + (i % 2) * 55;
+          ctx.beginPath();
+          ctx.ellipse(x, y, 44, 13, 0, 0, Math.PI * 2);
+          ctx.ellipse(x + 25, y - 9, 29, 18, 0, 0, Math.PI * 2);
+          ctx.ellipse(x + 50, y, 36, 12, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = "#6eabb080";
+        ctx.beginPath();
+        ctx.moveTo(0, 320);
+        ctx.lineTo(115, 224); ctx.lineTo(218, 316); ctx.lineTo(335, 234); ctx.lineTo(470, 322);
+        ctx.lineTo(620, 251); ctx.lineTo(770, 328); ctx.lineTo(960, 255);
+        ctx.lineTo(960, 430); ctx.lineTo(0, 430); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#fff8e9";
+        ctx.beginPath();
+        ctx.moveTo(282, 272); ctx.lineTo(335, 234); ctx.lineTo(387, 269); ctx.lineTo(352, 255);
+        ctx.lineTo(335, 263); ctx.lineTo(317, 250); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = sea;
+        ctx.beginPath();
+        ctx.moveTo(0, 380);
+        for (let x = 0; x <= width; x += 24) ctx.lineTo(x, 380 + Math.sin(x * .018 + state.frame * .035) * 5);
+        ctx.lineTo(width, height); ctx.lineTo(0, height); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = sand;
+        ctx.beginPath();
+        ctx.moveTo(0, 438);
+        for (let x = 0; x <= width; x += 20) ctx.lineTo(x, 435 + Math.sin(x * .012 + state.frame * .025) * 4);
+        ctx.lineTo(width, height); ctx.lineTo(0, height); ctx.closePath(); ctx.fill();
+        drawBackgroundKite(685, 230);
+        drawPalm(90, 418, .8);
+        drawPalm(880, 425, .65);
+      }
+
+      function drawBackgroundKite(x, y) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(Math.sin(state.frame * .025) * .06);
+        ctx.beginPath();
+        ctx.moveTo(0, -31); ctx.lineTo(28, 0); ctx.lineTo(0, 24); ctx.lineTo(-28, 0); ctx.closePath();
+        ctx.fillStyle = "#f4a54d"; ctx.fill();
+        ctx.strokeStyle = "#ffffffc9"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, 24); ctx.quadraticCurveTo(32, 54, 4, 83); ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawPalm(x, y, scale) {
+        ctx.save();
+        ctx.translate(x - state.camera * .3, y);
+        ctx.scale(scale, scale);
+        ctx.strokeStyle = "#84613d"; ctx.lineWidth = 12;
+        ctx.beginPath(); ctx.moveTo(0, 25); ctx.quadraticCurveTo(-4, -18, 9, -68); ctx.stroke();
+        ctx.strokeStyle = "#438d69"; ctx.lineWidth = 8;
+        for (let i = -2; i <= 2; i++) {
+          ctx.beginPath(); ctx.moveTo(8, -66);
+          ctx.quadraticCurveTo(i * 19, -93, i * 36 + 8, -75 + Math.abs(i) * 4); ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawPlatform(x, y, w) {
+        ctx.fillStyle = "#947a50"; ctx.fillRect(x, y, w, 62);
+        ctx.fillStyle = currentLesson().colors[3];
+        ctx.beginPath(); ctx.roundRect(x, y - 7, w, 15, 7); ctx.fill();
+        ctx.fillStyle = "#ffffff55";
+        for (let pebble = x + 24; pebble < x + w - 10; pebble += 58) {
+          ctx.beginPath(); ctx.ellipse(pebble, y + 24 + Math.sin(pebble) * 5, 8, 3, 0, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
+      function drawItems() {
+        state.items.forEach((item, index) => {
+          if (item.found) return;
+          const x = item.x - state.camera;
+          const y = item.y + Math.sin(state.frame * .08 + index * 2) * 5;
+          if (x < -40 || x > width + 40) return;
+          ctx.save(); ctx.translate(x, y);
+          ctx.shadowColor = "#fff2aa"; ctx.shadowBlur = 16;
+          ctx.fillStyle = "#fff3b8"; ctx.beginPath();
+          for (let point = 0; point < 10; point++) {
+            const radius = point % 2 === 0 ? 14 : 6;
+            const angle = -Math.PI / 2 + point * Math.PI / 5;
+            ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+          }
+          ctx.closePath(); ctx.fill(); ctx.restore();
+          ctx.fillStyle = "#ffffff9c"; ctx.beginPath(); ctx.arc(x - 19, y - 14, 3, 0, Math.PI * 2); ctx.fill();
+        });
+      }
+
+      function drawFinish() {
+        const x = worldLength - 95 - state.camera;
+        ctx.fillStyle = "#fff"; ctx.fillRect(x, 339, 7, 141);
+        ctx.fillStyle = "#ee8e57"; ctx.beginPath(); ctx.moveTo(x + 7, 341); ctx.lineTo(x + 79, 360); ctx.lineTo(x + 7, 380); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#fff9e8"; ctx.font = "700 14px Trebuchet MS, sans-serif";
+        ctx.fillText(state.items.every(item => item.found) ? "ZIEL!" : "3 ✦", x + 14, 365);
+      }
+
+      function drawCharacter() {
+        const x = player.x - state.camera;
+        const y = player.y;
+        const stride = player.grounded ? Math.sin(state.frame * .35) * Math.min(4, Math.abs(player.vx)) : 0;
+        ctx.save();
+        ctx.translate(x + player.w / 2, y + player.h / 2);
+        if (player.facing < 0) ctx.scale(-1, 1);
+        ctx.fillStyle = "#ffffff55"; ctx.beginPath(); ctx.ellipse(1, 29, 18, 5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#df8659"; ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.beginPath();
+        ctx.moveTo(-5, 14); ctx.lineTo(-7 + stride, 24); ctx.lineTo(-10 - stride, 29);
+        ctx.moveTo(6, 14); ctx.lineTo(8 - stride, 24); ctx.lineTo(12 + stride, 29); ctx.stroke();
+        ctx.fillStyle = "#ed8d65"; ctx.fillRect(-13, 27, 11, 5); ctx.fillRect(5, 27, 11, 5);
+        ctx.fillStyle = "#e75e67"; ctx.beginPath(); ctx.roundRect(-12, -6, 24, 23, 8); ctx.fill();
+        ctx.fillStyle = "#fff1df"; ctx.fillRect(-2, -3, 5, 17);
+        ctx.strokeStyle = "#efae7b"; ctx.lineWidth = 5; ctx.beginPath();
+        ctx.moveTo(-10, -1); ctx.lineTo(-17, 7); ctx.moveTo(10, -1); ctx.lineTo(16, 5 + Math.sin(state.frame * .15) * 2); ctx.stroke();
+        ctx.fillStyle = "#f4c394"; ctx.beginPath(); ctx.arc(0, -17, 13, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#e7b94e"; ctx.beginPath(); ctx.arc(0, -20, 14, Math.PI, Math.PI * 2);
+        ctx.lineTo(13, -11); ctx.quadraticCurveTo(8, -19, 3, -15); ctx.quadraticCurveTo(-3, -23, -11, -13);
+        ctx.lineTo(-14, -19); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#fffdf2"; ctx.beginPath(); ctx.ellipse(5, -17, 3.2, 4, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#44a8d1"; ctx.beginPath(); ctx.arc(6, -17, 1.7, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#765037"; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.arc(5, -10, 3, .15, 1.25); ctx.stroke();
+        ctx.restore();
+      }
+
+      function draw() {
+        drawBackground();
+        for (const [x, y] of currentLesson().platforms) {
+          const screenX = x - state.camera;
+          if (screenX < -360 || screenX > width + 10) continue;
+          drawPlatform(screenX, y, 340);
+        }
+        drawFinish(); drawItems(); drawCharacter();
+        if (state.message && state.frame < state.messageUntil) {
+          ctx.font = "700 15px Trebuchet MS, sans-serif";
+          const textWidth = ctx.measureText(state.message).width;
+          ctx.fillStyle = "#ffffffed"; ctx.beginPath();
+          ctx.roundRect((width - textWidth - 36) / 2, 104, textWidth + 36, 37, 18); ctx.fill();
+          ctx.fillStyle = "#285a70"; ctx.textAlign = "center"; ctx.fillText(state.message, width / 2, 128); ctx.textAlign = "left";
+        }
+      }
+
+      let lastTime = performance.now();
+      function loop(now) {
+        const dt = Math.min(.035, (now - lastTime) / 1000);
+        lastTime = now;
+        update(dt);
+        draw();
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+
+      const keyMap = { ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right", ArrowUp: "jump", KeyW: "jump", Space: "jump" };
+      window.addEventListener("keydown", event => {
+        if (event.code === "KeyR" && state.active) { restartLesson(); return; }
+        const control = keyMap[event.code];
+        if (control) { controls[control] = true; event.preventDefault(); }
+        if (event.code === "Enter" && !overlay.hidden) dialogButton.click();
+      });
+      window.addEventListener("keyup", event => {
+        const control = keyMap[event.code];
+        if (control) { controls[control] = false; event.preventDefault(); }
+      });
+      window.addEventListener("blur", () => { controls.left = false; controls.right = false; controls.jump = false; });
+      document.querySelectorAll("[data-control]").forEach(button => {
+        const control = button.dataset.control;
+        const release = event => {
+          event.preventDefault();
+          controls[control] = false;
+          button.classList.remove("is-pressed");
+          if (button.hasPointerCapture(event.pointerId)) button.releasePointerCapture(event.pointerId);
+        };
+        button.addEventListener("pointerdown", event => {
+          event.preventDefault(); controls[control] = true; button.classList.add("is-pressed"); button.setPointerCapture(event.pointerId);
+        });
+        button.addEventListener("pointerup", release);
+        button.addEventListener("pointercancel", release);
+        button.addEventListener("lostpointercapture", () => { controls[control] = false; button.classList.remove("is-pressed"); });
+      });
+    })();
+  </script>
+</body>
+</html>
