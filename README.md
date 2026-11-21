@@ -1,6 +1,6 @@
 # Johannas Kite-Abenteuer
 
-Ein kleines, deutschsprachiges Jump-and-Run als Geburtstagsgeschenk für Johanna und ihren Kitekurs auf Sizilien. Das Spiel läuft ohne Frameworks, externe Grafiken oder zusätzliche Abhängigkeiten direkt im Browser.
+Ein kleines, deutschsprachiges Kite-Abenteuer als Geburtstagsgeschenk für Johanna und ihren Kitekurs auf Sizilien. Die ganze Spielstrecke führt über offenes Wasser: Johanna fährt auf dem Kiteboard, fliegt einen sichtbaren Kite und sammelt passende Kurszeichen. Das Spiel läuft ohne Frameworks, externe Grafiken oder zusätzliche Abhängigkeiten direkt im Browser.
 
 ## Starten
 
@@ -8,8 +8,8 @@ Ein kleines, deutschsprachiges Jump-and-Run als Geburtstagsgeschenk für Johanna
 
 ## Spielen
 
-- **Tastatur:** Pfeiltasten oder A/D zum Laufen, Pfeil nach oben, W oder Leertaste zum Springen; R startet die aktuelle Etappe neu.
-- **Handy/Tablet:** Bildschirmtasten links, rechts und „Spring“ verwenden; im Querformat ist mehr von der Spielwelt zu sehen.
-- Sammle in jedem Abschnitt alle drei Sterne und erreiche dann das Ziel. Es gibt fünf Etappen: Wind entdecken, sicherer Start und Landung, Bodydrag, Wasserstart und erste Fahrt.
+- **Tastatur:** Pfeiltasten oder A/D zum Steuern übers Wasser, Pfeil nach oben, W oder Leertaste für den spielerischen Kite-Zug und Sprung; R startet die aktuelle Etappe neu.
+- **Handy/Tablet:** Die Bildschirmtasten links und rechts steuern die Fahrt; „Kite-Zug“ löst den Sprung aus. Im Querformat ist mehr von der Spielwelt zu sehen.
+- Sammle je drei zum Abschnitt passende Kurszeichen und erreiche die Zielboje: Wind und Kitefenster, Start und Landung im Team, Bodydrag und Boardfinden, Wasserstart sowie die erste Fahrt. Beim Bodydrag liegt Johanna spielerisch im Wasser; in den übrigen Abschnitten fährt sie auf dem Board.
 
 Die Lernabschnitte sind spielerische Inspiration und weder offizielle VDWS-Unterlagen noch eine Anleitung zum Kiten. Sicherheitsregeln und Praxis gehören in den Kitekurs und in die Hände einer qualifizierten Kurslehrkraft.

@@ -104,27 +104,27 @@
     </header>
     <section class="game-shell" aria-label="Kite-Abenteuer-Spiel">
       <div class="game-frame">
-        <canvas id="game" width="960" height="540" aria-label="Jump-and-Run: Laufe, springe und sammle Windsterne auf Sizilien."></canvas>
+        <canvas id="game" width="960" height="540" aria-label="Kite-Abenteuer auf dem Wasser: steuere deine Kiterin, fliege den Kite und sammle Kurszeichen."></canvas>
         <div class="hud" aria-live="polite">
           <div class="lesson-card">
             <span class="lesson-kicker" id="lesson-kicker">Dein Kitekurs · Etappe 1 von 5</span>
-            <span class="lesson-title" id="lesson-title">Wind entdecken</span>
-            <span class="lesson-hint" id="lesson-hint">Spüre die Böen und sammle drei Windsterne.</span>
+            <span class="lesson-title" id="lesson-title">Windfenster entdecken</span>
+            <span class="lesson-hint" id="lesson-hint">Steuere den Kite durch das Windfenster.</span>
           </div>
-          <div class="progress-card"><strong id="star-count">✦ 0 / 3</strong><span>Windsterne</span></div>
+          <div class="progress-card"><strong id="star-count">✦ 0 / 3</strong><span id="marker-label">Windfenster-Zeichen</span></div>
         </div>
         <div class="touch-controls" aria-label="Touch-Steuerung">
           <div class="direction-pad">
-            <button class="touch-button" type="button" data-control="left" aria-label="Nach links laufen">‹</button>
-            <button class="touch-button" type="button" data-control="right" aria-label="Nach rechts laufen">›</button>
+            <button class="touch-button" type="button" data-control="left" aria-label="Nach links kiten">‹</button>
+            <button class="touch-button" type="button" data-control="right" aria-label="Nach rechts kiten">›</button>
           </div>
-          <div class="action-pad"><button class="touch-button jump" type="button" data-control="jump" aria-label="Springen">SPRING</button></div>
+          <div class="action-pad"><button class="touch-button jump" type="button" data-control="jump" aria-label="Kite-Zug und Sprung">KITE-ZUG</button></div>
         </div>
         <div class="overlay" id="overlay">
           <div class="dialog">
             <div class="dialog-emoji" id="dialog-emoji">🌊 🪁</div>
             <h2 id="dialog-title">Ciao Johanna!</h2>
-            <p id="dialog-copy">Bereit für dein Kite-Abenteuer an der sonnigen Küste Siziliens? Hilf unserer kleinen Kiterin, fünf Etappen zu meistern und alle Windsterne zu finden.</p>
+            <p id="dialog-copy">Bereit für dein Kite-Abenteuer direkt auf dem Wasser? Fliege mit Johanna den Kite, entdecke dein Board wieder und fahre durch fünf Kurs-Etappen.</p>
             <div class="gift-note" id="dialog-note">🎂 Alles Liebe zum Geburtstag! Ein kleiner Vorgeschmack auf deinen Kitekurs – das echte Abenteuer wartet auf Sizilien.</div>
             <button class="primary" id="dialog-button" type="button">Abenteuer starten</button>
           </div>
@@ -132,7 +132,7 @@
       </div>
     </section>
     <footer class="below">
-      <p class="controls-copy"><strong>Steuerung:</strong> ← → oder A / D laufen · ↑, W oder Leertaste springen · R Etappe neu starten</p>
+      <p class="controls-copy"><strong>Steuerung:</strong> ← → oder A / D übers Wasser · ↑, W oder Leertaste Kite-Zug · R Etappe neu starten</p>
       <p class="safety">Spielerische Kurs-Inspiration, keine offizielle VDWS-Unterlage oder Praxisanleitung. Kiten und Sicherheitsregeln lernst du vor Ort immer mit deiner qualifizierten Kurslehrerin oder deinem Kurslehrer. <span class="mobile-hint">Am besten im Querformat spielen.</span></p>
     </footer>
   </main>
@@ -151,59 +151,57 @@
       const lessonTitle = document.getElementById("lesson-title");
       const lessonHint = document.getElementById("lesson-hint");
       const starCount = document.getElementById("star-count");
+      const markerLabel = document.getElementById("marker-label");
       const width = canvas.width;
       const height = canvas.height;
 
       const lessons = [
         {
-          title: "Wind entdecken", hint: "Spüre die Böen und sammle drei Windsterne.", world: "Land",
-          colors: ["#83d9ec", "#c5edf0", "#4d9b8c", "#e7c77f"],
-          items: [[280, 400], [760, 347], [1335, 400]],
-          platforms: [[0, 480], [420, 480], [840, 480], [1260, 480], [1680, 480], [370, 399], [790, 367], [1120, 405], [1375, 382]],
-          note: "Der Wind verändert sich – beim Kurs lernst du, Windrichtung und Kitefenster unter Anleitung einzuschätzen."
+          title: "Wind & Kitefenster", hint: "Fahre übers Wasser und sammle drei Zeichen im Windfenster.",
+          colors: ["#79d7ee", "#b8edf3", "#218eaf", "#e7c77f"], marker: "wind",
+          items: [[280, 287], [760, 270], [1335, 300]],
+          note: "Das Kitefenster zeigt spielerisch, wo der Kite am Himmel fliegen kann. Wind und Kitekontrolle lernst du praktisch mit deiner Kurslehrkraft."
         },
         {
-          title: "Sicher starten & landen", hint: "Finde die Helfer-Flaggen auf deinem Weg.", world: "Startplatz",
-          colors: ["#8bdced", "#d4f0e9", "#6db889", "#e4c47d"],
-          items: [[350, 400], [895, 360], [1450, 344]],
-          platforms: [[0, 480], [420, 480], [840, 480], [1260, 480], [1680, 480], [420, 400], [780, 386], [1160, 404], [1380, 370]],
-          note: "Start und Landung brauchen ein Team und freie Fläche. Die echten Abläufe zeigt dir deine Kurslehrkraft."
+          title: "Start & Landung im Team", hint: "Fahre zu den Helferbojen und sammle drei Teamzeichen.",
+          colors: ["#83dcef", "#c4eff1", "#218fad", "#f0d283"], marker: "team",
+          items: [[350, 354], [895, 330], [1450, 352]],
+          note: "Am Wasser helfen sich Kiterinnen und Kiter beim Starten und Landen. Die passenden Zeichen und Abläufe erklärt dir dein Kursteam vor Ort."
         },
         {
-          title: "Bodydrag entdecken", hint: "Gleite durch die blaue Lagune und sammle Muscheln.", world: "Lagune",
-          colors: ["#79d7ef", "#c4eff1", "#43b6c1", "#d9d59a"],
-          items: [[250, 414], [790, 393], [1370, 360]],
-          platforms: [[0, 480], [420, 480], [840, 480], [1260, 480], [1680, 480], [340, 418], [660, 400], [1080, 417], [1300, 386]],
-          note: "Bodydrag ist ein Lernschritt im Wasser. Übe ihn ausschließlich so, wie deine Kurslehrkraft es dir zeigt."
+          title: "Bodydrag & Board finden", hint: "Gleite durchs Wasser und entdecke dein treibendes Board.",
+          colors: ["#73d3ed", "#b5edf0", "#168daf", "#ead08b"], marker: "board",
+          items: [[250, 375], [790, 352], [1370, 372]],
+          note: "Beim Bodydrag bewegst du dich im Wasser; danach gehört auch das Wiederfinden des Boards zum Kurs. Übe das ausschließlich mit deiner Kurslehrkraft."
         },
         {
-          title: "Wasserstart üben", hint: "Springe über die Wellen und finde dein Board.", world: "Wellen",
-          colors: ["#76cde7", "#c7e9ef", "#369eaf", "#e7cb8d"],
-          items: [[320, 365], [900, 337], [1430, 363]],
-          platforms: [[0, 480], [420, 480], [840, 480], [1260, 480], [1680, 480], [360, 405], [730, 374], [1125, 407], [1350, 389]],
-          note: "Beim Wasserstart kommen mehrere Dinge zusammen. Das sichere Timing übst du Schritt für Schritt mit deinem Kurs."
+          title: "Wasserstart", hint: "Sammle drei Startbojen auf deiner Fahrt übers Wasser.",
+          colors: ["#78d8ef", "#b9edf2", "#147f9f", "#e9c97e"], marker: "start",
+          items: [[320, 353], [900, 328], [1430, 352]],
+          note: "Beim Wasserstart kommen Kite, Board und Gleichgewicht zusammen. Die sichere Bewegung lernst du Schritt für Schritt bei deiner Kurslehrkraft."
         },
         {
-          title: "Die erste Fahrt!", hint: "Sammle die letzten Sterne und surfe ins Ziel.", world: "Erste Fahrt",
-          colors: ["#71cce8", "#c6ebf0", "#3babb7", "#e5c27b"],
-          items: [[300, 400], [820, 350], [1370, 379]],
-          platforms: [[0, 480], [420, 480], [840, 480], [1260, 480], [1680, 480], [390, 390], [755, 375], [1130, 405], [1400, 385]],
+          title: "Erste Fahrt!", hint: "Halte deine Fahrt übers Wasser bis zum Ziel.",
+          colors: ["#74d2ec", "#b5ebf1", "#1387a9", "#e6c77e"], marker: "ride",
+          items: [[300, 362], [820, 336], [1370, 358]],
           note: "Juhu, die erste Fahrt! Im echten Kurs stehen Spaß, passende Bedingungen und Sicherheit immer an erster Stelle."
         }
       ];
 
-      const player = { x: 65, y: 0, vx: 0, vy: 0, w: 32, h: 52, grounded: false, facing: 1 };
+      const player = { x: 195, y: 0, vx: 0, vy: 0, w: 32, h: 52, grounded: false, facing: 1 };
       const controls = { left: false, right: false, jump: false };
       const state = { level: 0, camera: 0, items: [], active: false, frame: 0, message: "", messageUntil: 0 };
       const worldLength = 1900;
       const currentLesson = () => lessons[state.level];
+      const waterSurface = (x, frame) =>
+        413 + Math.sin(x * .018 + frame * .035) * 5 + Math.sin(x * .043 - frame * .025) * 2;
 
       function loadLesson(index) {
         state.level = index;
         state.camera = 0;
         state.items = currentLesson().items.map(([x, y]) => ({ x, y, found: false }));
-        player.x = 65;
-        player.y = 420;
+        player.x = 195;
+        player.y = waterSurface(player.x, state.frame) - player.h - 8;
         player.vx = 0;
         player.vy = 0;
         player.grounded = false;
@@ -215,6 +213,13 @@
         lessonTitle.textContent = currentLesson().title;
         lessonHint.textContent = currentLesson().hint;
         starCount.textContent = `✦ ${state.items.filter(item => item.found).length} / ${state.items.length}`;
+        markerLabel.textContent = {
+          wind: "Windfenster-Zeichen",
+          team: "Teamzeichen",
+          board: "Board-Fundzeichen",
+          start: "Startbojen",
+          ride: "Fahrtmarker"
+        }[currentLesson().marker];
       }
 
       function showDialog({ emoji, title, copy, note, button, action }) {
@@ -244,7 +249,7 @@
       function nextLesson() {
         if (state.level < lessons.length - 1) {
           loadLesson(state.level + 1);
-          const emojis = ["🍃 🪁", "🚩 🤝", "🐚 🌊", "🏄‍♀️ 💦", "🌟 🏖️"];
+          const emojis = ["🍃 🪁", "🚩 🤝", "🏄‍♀️ 🌊", "🛟 💦", "🌟 🏄‍♀️"];
           showDialog({
             emoji: emojis[state.level], title: currentLesson().title,
             copy: `Etappe ${state.level + 1} von ${lessons.length}: ${currentLesson().hint}`,
@@ -253,7 +258,7 @@
         } else {
           showDialog({
             emoji: "🏄‍♀️ 🌟 🎂", title: "Du hast es geschafft, Johanna!",
-            copy: "Fünf Etappen, jede Menge Windsterne und deine erste spielerische Kite-Fahrt – die sonnige Küste Siziliens wartet schon auf dich!",
+            copy: "Fünf Etappen, deine erste spielerische Kite-Fahrt und die ganze Strecke auf dem Wasser – die sizilianische Küste wartet schon auf dich!",
             note: "Alles Liebe zum Geburtstag und ganz viel Freude bei deinem Kitekurs! 🎁☀️",
             button: "Nochmal spielen", action: startGame
           });
@@ -273,7 +278,6 @@
       function update(dt) {
         if (!state.active) return;
         state.frame += dt * 60;
-        const previousBottom = player.y + player.h;
         const speed = 4.05;
         player.vx = (controls.right ? speed : 0) - (controls.left ? speed : 0);
         if (player.vx !== 0) player.facing = Math.sign(player.vx);
@@ -285,28 +289,24 @@
         player.x = Math.max(0, Math.min(worldLength - player.w, player.x + player.vx * dt * 60));
         player.y += player.vy * dt * 60;
         player.grounded = false;
-
-        for (const [platformX, platformY] of currentLesson().platforms) {
-          if (player.vy >= 0 && previousBottom <= platformY + 5 && player.y + player.h >= platformY &&
-              player.x + player.w > platformX && player.x < platformX + 340) {
-            player.y = platformY - player.h;
-            player.vy = 0;
-            player.grounded = true;
-          }
-        }
-
-        if (player.y > height + 80) {
-          player.x = Math.max(65, player.x - 180);
-          player.y = 300;
+        const waterY = waterSurface(player.x + player.w / 2, state.frame);
+        if (player.vy >= 0 && player.y + player.h >= waterY) {
+          player.y = waterY - player.h - 8;
           player.vy = 0;
-          toast("Hoppla! Versuch's nochmal.");
+          player.grounded = true;
         }
 
         for (const item of state.items) {
           if (!item.found && Math.hypot(player.x + player.w / 2 - item.x, player.y + player.h / 2 - item.y) < 37) {
             item.found = true;
             updateHud();
-            toast(["Windstern entdeckt!", "Super Teamwork!", "Muschel gefunden!", "Board gefunden!", "Stern für deine erste Fahrt!"][state.level]);
+            toast([
+              "Windfenster-Zeichen entdeckt!",
+              "Teamzeichen an der Helferboje!",
+              "Dein Board ist wieder da!",
+              "Wasserstart-Boje erreicht!",
+              "Fahrtmarker eingesammelt!"
+            ][state.level]);
           }
         }
 
@@ -317,23 +317,24 @@
           if (state.items.every(item => item.found)) nextLesson();
           else {
             player.x = worldLength - 135;
-            toast("Finde erst alle drei Sterne!");
+            toast("Sammle erst alle drei Kurszeichen!");
           }
         }
       }
 
       function drawBackground() {
-        const [sky, haze, sea, sand] = currentLesson().colors;
-        const gradient = ctx.createLinearGradient(0, 0, 0, height);
-        gradient.addColorStop(0, sky);
-        gradient.addColorStop(.68, haze);
-        gradient.addColorStop(1, sea);
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, width, height);
+        const [sky, haze, sea] = currentLesson().colors;
+        const skyGradient = ctx.createLinearGradient(0, 0, 0, 245);
+        skyGradient.addColorStop(0, sky);
+        skyGradient.addColorStop(1, haze);
+        ctx.fillStyle = skyGradient;
+        ctx.fillRect(0, 0, width, 245);
+
         ctx.fillStyle = "#fff4c6";
         ctx.beginPath();
         ctx.arc(790, 110, 39, 0, Math.PI * 2);
         ctx.fill();
+
         ctx.fillStyle = "#ffffff75";
         for (let i = 0; i < 4; i++) {
           const x = ((i * 280 - state.camera * .18) % 1200 + 1200) % 1200 - 80;
@@ -344,65 +345,104 @@
           ctx.ellipse(x + 50, y, 36, 12, 0, 0, Math.PI * 2);
           ctx.fill();
         }
-        ctx.fillStyle = "#6eabb080";
+
+        const waterGradient = ctx.createLinearGradient(0, 215, 0, height);
+        waterGradient.addColorStop(0, "#75c9dc");
+        waterGradient.addColorStop(.42, sea);
+        waterGradient.addColorStop(1, "#075979");
+        ctx.fillStyle = waterGradient;
+        ctx.fillRect(0, 215, width, height - 215);
+
+        ctx.fillStyle = "#6d9da888";
         ctx.beginPath();
-        ctx.moveTo(0, 320);
-        ctx.lineTo(115, 224); ctx.lineTo(218, 316); ctx.lineTo(335, 234); ctx.lineTo(470, 322);
-        ctx.lineTo(620, 251); ctx.lineTo(770, 328); ctx.lineTo(960, 255);
-        ctx.lineTo(960, 430); ctx.lineTo(0, 430); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = "#fff8e9";
+        ctx.moveTo(0, 246);
+        ctx.lineTo(90, 229); ctx.lineTo(154, 242); ctx.lineTo(240, 218); ctx.lineTo(302, 243);
+        ctx.lineTo(397, 225); ctx.lineTo(466, 241); ctx.lineTo(553, 216); ctx.lineTo(632, 241);
+        ctx.lineTo(727, 225); ctx.lineTo(817, 243); ctx.lineTo(899, 220); ctx.lineTo(960, 236);
+        ctx.lineTo(960, 252); ctx.lineTo(0, 252); ctx.closePath(); ctx.fill();
+
+        ctx.strokeStyle = "#d7faff75";
+        ctx.lineWidth = 2;
+        for (let row = 0; row < 7; row++) {
+          const y = 273 + row * 31;
+          ctx.beginPath();
+          for (let x = -24; x <= width + 24; x += 16) {
+            const waveY = y + Math.sin((x + state.camera * (.25 + row * .04)) * .025 + state.frame * (.035 + row * .002)) * (3 + row * .35);
+            if (x === -24) ctx.moveTo(x, waveY);
+            else ctx.lineTo(x, waveY);
+          }
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = "#f4ffffad";
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(282, 272); ctx.lineTo(335, 234); ctx.lineTo(387, 269); ctx.lineTo(352, 255);
-        ctx.lineTo(335, 263); ctx.lineTo(317, 250); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = sea;
-        ctx.beginPath();
-        ctx.moveTo(0, 380);
-        for (let x = 0; x <= width; x += 24) ctx.lineTo(x, 380 + Math.sin(x * .018 + state.frame * .035) * 5);
-        ctx.lineTo(width, height); ctx.lineTo(0, height); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = sand;
-        ctx.beginPath();
-        ctx.moveTo(0, 438);
-        for (let x = 0; x <= width; x += 20) ctx.lineTo(x, 435 + Math.sin(x * .012 + state.frame * .025) * 4);
-        ctx.lineTo(width, height); ctx.lineTo(0, height); ctx.closePath(); ctx.fill();
-        drawBackgroundKite(685, 230);
-        drawPalm(90, 418, .8);
-        drawPalm(880, 425, .65);
+        for (let x = 0; x <= width; x += 12) {
+          const y = waterSurface(x + state.camera, state.frame);
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        for (let x = 80; x < width; x += 180) {
+          const sparkleX = ((x - state.camera * .7) % (width + 120) + width + 120) % (width + 120) - 60;
+          const y = 285 + ((x / 180) % 5) * 37 + Math.sin(state.frame * .03 + x) * 5;
+          ctx.fillStyle = "#efffff88";
+          ctx.beginPath();
+          ctx.ellipse(sparkleX, y, 9, 2, -.06, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        drawWindWindow();
+        drawCourseScenery();
       }
 
-      function drawBackgroundKite(x, y) {
+      function drawWindWindow() {
+        if (state.level !== 0) return;
+        const anchorX = 175 - state.camera;
+        if (anchorX < -450 || anchorX > width + 100) return;
+        const anchorY = waterSurface(175, state.frame) - 13;
         ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(Math.sin(state.frame * .025) * .06);
+        ctx.fillStyle = "#fff7c91c";
         ctx.beginPath();
-        ctx.moveTo(0, -31); ctx.lineTo(28, 0); ctx.lineTo(0, 24); ctx.lineTo(-28, 0); ctx.closePath();
-        ctx.fillStyle = "#f4a54d"; ctx.fill();
-        ctx.strokeStyle = "#ffffffc9"; ctx.lineWidth = 2; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, 24); ctx.quadraticCurveTo(32, 54, 4, 83); ctx.stroke();
+        ctx.moveTo(anchorX, anchorY);
+        ctx.quadraticCurveTo(anchorX + 25, 115, anchorX + 220, 95);
+        ctx.quadraticCurveTo(anchorX + 300, 235, anchorX + 395, anchorY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff66";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 8]);
+        ctx.beginPath();
+        ctx.moveTo(anchorX + 4, anchorY - 5);
+        ctx.quadraticCurveTo(anchorX + 150, 195, anchorX + 392, anchorY - 5);
+        ctx.stroke();
         ctx.restore();
       }
 
-      function drawPalm(x, y, scale) {
-        ctx.save();
-        ctx.translate(x - state.camera * .3, y);
-        ctx.scale(scale, scale);
-        ctx.strokeStyle = "#84613d"; ctx.lineWidth = 12;
-        ctx.beginPath(); ctx.moveTo(0, 25); ctx.quadraticCurveTo(-4, -18, 9, -68); ctx.stroke();
-        ctx.strokeStyle = "#438d69"; ctx.lineWidth = 8;
-        for (let i = -2; i <= 2; i++) {
-          ctx.beginPath(); ctx.moveTo(8, -66);
-          ctx.quadraticCurveTo(i * 19, -93, i * 36 + 8, -75 + Math.abs(i) * 4); ctx.stroke();
-        }
-        ctx.restore();
-      }
-
-      function drawPlatform(x, y, w) {
-        ctx.fillStyle = "#947a50"; ctx.fillRect(x, y, w, 62);
-        ctx.fillStyle = currentLesson().colors[3];
-        ctx.beginPath(); ctx.roundRect(x, y - 7, w, 15, 7); ctx.fill();
-        ctx.fillStyle = "#ffffff55";
-        for (let pebble = x + 24; pebble < x + w - 10; pebble += 58) {
-          ctx.beginPath(); ctx.ellipse(pebble, y + 24 + Math.sin(pebble) * 5, 8, 3, 0, 0, Math.PI * 2); ctx.fill();
-        }
+      function drawCourseScenery() {
+        const screenX = worldLength - 280 - state.camera;
+        if (screenX < -100 || screenX > width + 100) return;
+        const surfaceY = waterSurface(worldLength - 280, state.frame);
+        ctx.fillStyle = "#fff7e2";
+        ctx.beginPath();
+        ctx.moveTo(screenX - 40, surfaceY + 1);
+        ctx.quadraticCurveTo(screenX - 20, surfaceY - 17, screenX + 34, surfaceY - 13);
+        ctx.lineTo(screenX + 64, surfaceY + 1);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = "#ee8e57";
+        ctx.fillRect(screenX + 3, surfaceY - 56, 4, 42);
+        ctx.beginPath();
+        ctx.moveTo(screenX + 7, surfaceY - 54);
+        ctx.lineTo(screenX + 29, surfaceY - 47);
+        ctx.lineTo(screenX + 7, surfaceY - 40);
+        ctx.fill();
+        ctx.fillStyle = "#f7e5a1";
+        ctx.beginPath();
+        ctx.arc(screenX - 23, surfaceY + 2, 8, 0, Math.PI * 2);
+        ctx.arc(screenX + 42, surfaceY + 2, 8, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       function drawItems() {
@@ -412,24 +452,103 @@
           const y = item.y + Math.sin(state.frame * .08 + index * 2) * 5;
           if (x < -40 || x > width + 40) return;
           ctx.save(); ctx.translate(x, y);
-          ctx.shadowColor = "#fff2aa"; ctx.shadowBlur = 16;
-          ctx.fillStyle = "#fff3b8"; ctx.beginPath();
-          for (let point = 0; point < 10; point++) {
-            const radius = point % 2 === 0 ? 14 : 6;
-            const angle = -Math.PI / 2 + point * Math.PI / 5;
-            ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+          ctx.shadowColor = "#fff2aa";
+          ctx.shadowBlur = 13;
+
+          if (currentLesson().marker === "wind") {
+            ctx.fillStyle = "#fff3b8";
+            ctx.beginPath();
+            ctx.moveTo(0, -17); ctx.lineTo(15, 0); ctx.lineTo(0, 13); ctx.lineTo(-15, 0);
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          } else if (currentLesson().marker === "team") {
+            ctx.fillStyle = "#f3d577";
+            ctx.beginPath(); ctx.ellipse(0, 9, 17, 7, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "#fff8df";
+            ctx.fillRect(-2, -17, 3, 25);
+            ctx.fillStyle = "#ed8066";
+            ctx.beginPath(); ctx.moveTo(1, -16); ctx.lineTo(17, -11); ctx.lineTo(1, -5); ctx.fill();
+          } else if (currentLesson().marker === "board" || currentLesson().marker === "ride") {
+            ctx.rotate(-.16);
+            ctx.fillStyle = currentLesson().marker === "board" ? "#ffb34e" : "#f4ffff";
+            ctx.beginPath();
+            ctx.moveTo(-20, 2); ctx.quadraticCurveTo(-15, -7, 0, -7);
+            ctx.quadraticCurveTo(16, -7, 21, 2); ctx.quadraticCurveTo(15, 9, 0, 8);
+            ctx.quadraticCurveTo(-16, 9, -20, 2); ctx.fill();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(-12, 1); ctx.lineTo(12, 1); ctx.stroke();
+            if (currentLesson().marker === "ride") {
+              ctx.strokeStyle = "#b9f4ff";
+              ctx.beginPath(); ctx.moveTo(-25, 13); ctx.quadraticCurveTo(0, 20, 24, 13); ctx.stroke();
+            }
+          } else {
+            ctx.fillStyle = currentLesson().marker === "start" ? "#ee786d" : "#fff3b8";
+            ctx.beginPath(); ctx.arc(0, 0, 13, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(0, 0, 4, 0, Math.PI * 2);
+            ctx.fill();
           }
-          ctx.closePath(); ctx.fill(); ctx.restore();
-          ctx.fillStyle = "#ffffff9c"; ctx.beginPath(); ctx.arc(x - 19, y - 14, 3, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+          ctx.fillStyle = "#ffffff9c";
+          ctx.beginPath(); ctx.arc(x - 22, y - 16, 3, 0, Math.PI * 2); ctx.fill();
         });
       }
 
       function drawFinish() {
         const x = worldLength - 95 - state.camera;
-        ctx.fillStyle = "#fff"; ctx.fillRect(x, 339, 7, 141);
-        ctx.fillStyle = "#ee8e57"; ctx.beginPath(); ctx.moveTo(x + 7, 341); ctx.lineTo(x + 79, 360); ctx.lineTo(x + 7, 380); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = "#fff9e8"; ctx.font = "700 14px Trebuchet MS, sans-serif";
-        ctx.fillText(state.items.every(item => item.found) ? "ZIEL!" : "3 ✦", x + 14, 365);
+        const surfaceY = waterSurface(worldLength - 95, state.frame);
+        ctx.fillStyle = "#fff5d5";
+        ctx.beginPath(); ctx.ellipse(x + 5, surfaceY + 1, 23, 8, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#ee8e57"; ctx.fillRect(x + 3, surfaceY - 43, 4, 36);
+        ctx.fillStyle = "#f38d73";
+        ctx.beginPath(); ctx.moveTo(x + 7, surfaceY - 41); ctx.lineTo(x + 48, surfaceY - 29); ctx.lineTo(x + 7, surfaceY - 17); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#fff9e8";
+        ctx.font = "700 11px Trebuchet MS, sans-serif";
+        ctx.fillText(state.items.every(item => item.found) ? "ZIEL!" : "✦ 3", x + 13, surfaceY - 27);
+      }
+
+      function drawKite() {
+        const riderX = player.x - state.camera + player.w / 2;
+        const riderY = player.y + 13;
+        const kiteX = riderX + player.facing * (95 + Math.sin(state.frame * .024) * 12);
+        const kiteY = Math.max(105, player.y - 132 + Math.sin(state.frame * .03) * 10);
+
+        ctx.strokeStyle = "#ffffffcc";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(riderX - 7, riderY);
+        ctx.quadraticCurveTo(riderX + player.facing * 38, riderY - 64, kiteX, kiteY + 12);
+        ctx.moveTo(riderX + 8, riderY + 1);
+        ctx.quadraticCurveTo(riderX + player.facing * 48, riderY - 58, kiteX + 8, kiteY + 10);
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(kiteX, kiteY);
+        ctx.rotate(Math.sin(state.frame * .025) * .045);
+        ctx.beginPath();
+        ctx.moveTo(-38, 4); ctx.quadraticCurveTo(-29, -9, -13, -12);
+        ctx.quadraticCurveTo(0, -22, 13, -12); ctx.quadraticCurveTo(29, -9, 38, 4);
+        ctx.quadraticCurveTo(20, 13, 0, 7); ctx.quadraticCurveTo(-20, 13, -38, 4);
+        ctx.closePath();
+        ctx.fillStyle = "#f49b4b";
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-23, -8); ctx.quadraticCurveTo(-10, 4, 0, 7);
+        ctx.quadraticCurveTo(10, 4, 23, -8);
+        ctx.strokeStyle = "#ffe6b4";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
       }
 
       function drawCharacter() {
@@ -438,33 +557,64 @@
         const stride = player.grounded ? Math.sin(state.frame * .35) * Math.min(4, Math.abs(player.vx)) : 0;
         ctx.save();
         ctx.translate(x + player.w / 2, y + player.h / 2);
-        if (player.facing < 0) ctx.scale(-1, 1);
+        if (state.level === 2) ctx.rotate(player.facing > 0 ? Math.PI / 2 : -Math.PI / 2);
+        else if (player.facing < 0) ctx.scale(-1, 1);
+        ctx.scale(1.3, 1.3);
         ctx.fillStyle = "#ffffff55"; ctx.beginPath(); ctx.ellipse(1, 29, 18, 5, 0, 0, Math.PI * 2); ctx.fill();
         ctx.strokeStyle = "#df8659"; ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.beginPath();
         ctx.moveTo(-5, 14); ctx.lineTo(-7 + stride, 24); ctx.lineTo(-10 - stride, 29);
         ctx.moveTo(6, 14); ctx.lineTo(8 - stride, 24); ctx.lineTo(12 + stride, 29); ctx.stroke();
         ctx.fillStyle = "#ed8d65"; ctx.fillRect(-13, 27, 11, 5); ctx.fillRect(5, 27, 11, 5);
+        if (state.level !== 2) {
+          ctx.fillStyle = "#f4a44b";
+          ctx.beginPath();
+          ctx.moveTo(-27, 34); ctx.quadraticCurveTo(-24, 30, -14, 31);
+          ctx.lineTo(22, 31); ctx.quadraticCurveTo(30, 34, 24, 38);
+          ctx.lineTo(-20, 38); ctx.closePath(); ctx.fill();
+          ctx.strokeStyle = "#fff4d6"; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(-12, 33); ctx.lineTo(-12, 37); ctx.moveTo(11, 33); ctx.lineTo(11, 37); ctx.stroke();
+        }
         ctx.fillStyle = "#e75e67"; ctx.beginPath(); ctx.roundRect(-12, -6, 24, 23, 8); ctx.fill();
         ctx.fillStyle = "#fff1df"; ctx.fillRect(-2, -3, 5, 17);
         ctx.strokeStyle = "#efae7b"; ctx.lineWidth = 5; ctx.beginPath();
         ctx.moveTo(-10, -1); ctx.lineTo(-17, 7); ctx.moveTo(10, -1); ctx.lineTo(16, 5 + Math.sin(state.frame * .15) * 2); ctx.stroke();
+        const hairFlow = Math.sin(state.frame * .09 + player.vx * .08) * 2;
+        ctx.fillStyle = "#e7b94e";
+        ctx.beginPath();
+        ctx.moveTo(-8, -27);
+        ctx.quadraticCurveTo(-22, -32, -20, -19);
+        ctx.quadraticCurveTo(-25 + hairFlow, -11, -17, -6);
+        ctx.quadraticCurveTo(-24 + hairFlow, 2, -18 + hairFlow, 22);
+        ctx.quadraticCurveTo(-10, 20, -10, 11);
+        ctx.lineTo(-8, -5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#f5d477";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-17, -18); ctx.quadraticCurveTo(-20 + hairFlow, -6, -14 + hairFlow, 17);
+        ctx.moveTo(-12, -23); ctx.quadraticCurveTo(-17 + hairFlow, -10, -10, 1);
+        ctx.stroke();
         ctx.fillStyle = "#f4c394"; ctx.beginPath(); ctx.arc(0, -17, 13, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = "#e7b94e"; ctx.beginPath(); ctx.arc(0, -20, 14, Math.PI, Math.PI * 2);
         ctx.lineTo(13, -11); ctx.quadraticCurveTo(8, -19, 3, -15); ctx.quadraticCurveTo(-3, -23, -11, -13);
         ctx.lineTo(-14, -19); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = "#fffdf2"; ctx.beginPath(); ctx.ellipse(5, -17, 3.2, 4, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "#44a8d1"; ctx.beginPath(); ctx.arc(6, -17, 1.7, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#fffdf2";
+        ctx.beginPath(); ctx.ellipse(1, -17, 3, 3.7, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(8, -17, 3, 3.7, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#328fce";
+        ctx.beginPath(); ctx.arc(1.7, -16.7, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(8.7, -16.7, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#123e69";
+        ctx.beginPath(); ctx.arc(2, -16.8, .8, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(9, -16.8, .8, 0, Math.PI * 2); ctx.fill();
         ctx.strokeStyle = "#765037"; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.arc(5, -10, 3, .15, 1.25); ctx.stroke();
         ctx.restore();
       }
 
       function draw() {
         drawBackground();
-        for (const [x, y] of currentLesson().platforms) {
-          const screenX = x - state.camera;
-          if (screenX < -360 || screenX > width + 10) continue;
-          drawPlatform(screenX, y, 340);
-        }
+        drawKite();
         drawFinish(); drawItems(); drawCharacter();
         if (state.message && state.frame < state.messageUntil) {
           ctx.font = "700 15px Trebuchet MS, sans-serif";
