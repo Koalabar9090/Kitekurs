@@ -2,6 +2,14 @@
 
 Ein kleines, deutschsprachiges Kite-Abenteuer als Geburtstagsgeschenk für Johanna und ihren Kitekurs auf Sizilien. Die ganze Spielstrecke führt über offenes Wasser: Johanna fährt auf dem Kiteboard, fliegt einen sichtbaren Kite und sammelt passende Kurszeichen. Das Spiel läuft ohne Frameworks, externe Grafiken oder zusätzliche Abhängigkeiten direkt im Browser.
 
+## Online spielen
+
+[Johannas Kite-Abenteuer starten](https://koalabar9090.github.io/Kitekurs/)
+
+Den QR-Code einfach mit der Handykamera scannen:
+
+![QR-Code zu Johannas Kite-Abenteuer](johanna-kite-abenteuer-qr.png)
+
 ## Starten
 
 `index.html` in einem aktuellen Browser öffnen. Zum lokalen Entwickeln kann im Projektordner auch ein beliebiger statischer HTTP-Server gestartet werden.
